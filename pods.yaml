@@ -1,0 +1,16 @@
+# https://labs.play-with-k8s.com/
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-Pod
+  labels:
+    app: nginx
+    tier: dev
+spec:
+  containers:
+  - name: nginx-container
+    image: nginx
+
+    port:
+    - containerPort: 80
