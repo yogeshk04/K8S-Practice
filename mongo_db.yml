@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongodb-deployment^
+  name: mongodb-deployment
   labels:
     app: mongodb
 spec:
@@ -17,10 +17,6 @@ spec:
       containers:
       - name: mongodb
         image: mongo
-        resources:
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
         ports:
         - containerPort: 27017
         env:
@@ -34,3 +30,16 @@ spec:
             secretKeyRef:
               name: mongodb-secret
               key: mongodb-root-password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service
+spec:
+  selector:
+    app: mongodb
+  ports:
+  - protocol: TCP
+    port: 27017
+    targetPort: 27017
+
