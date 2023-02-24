@@ -1,0 +1,20 @@
+    1  k get pod
+    2  k run pod nginx-pod --image nginx:alpine
+    3  k get po
+    4  k get po
+    5  k run nginx-pod --image nginx:alpine
+    6  k get pod
+    7  k run redis --image redis:alpine --labels tier=db
+    8  k get po
+    9  k expose pod redis --port=6379 --name redis-service
+   10  k get svc
+   11  k create deployment webapp --image kodekloud/webapp-color --replicas 3
+   12  k get deployments
+   13  k get deploy
+   14  k run custom-nginx --image nginx --port 8080
+   15  k get po
+   16  k get po
+   17  k create ns dev-ns
+   18  k create deployment redis-deploy -n dev-ns --image redis --replicas 2
+   19  k run httpd --image httpd:alpine --port 80 --expose
+   20  history

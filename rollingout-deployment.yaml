@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-deployment
+  labels:
+    app: myapp
+    type: front-end
+
+spec:
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      name: myapp-pod
+      labels:
+        app: myapp
+
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx:1.12-err
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+  replicas: 6

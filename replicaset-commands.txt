@@ -1,0 +1,41 @@
+   1  k get pod
+    2  k get all
+    3  k get pod
+    4  k get rs
+    5  k get rs
+    6  k get rs
+    7  k get rs -o wide
+    8  k get pod
+    9  k describe networkpolicies.networking.k8s.io 
+   10  k delete pod new-replica-set-42m65 
+   11  k get po
+   12  ls
+   13  k apply -f replicaset-definition-1.yaml 
+   14  k ls
+   15  vi replicaset-definition-1.yaml 
+   16  cat replicaset-definition-1.yaml 
+   17  k apply -f replicaset-definition-1.yaml 
+   18  k get all
+   19  vi replicaset-definition-2.yaml 
+   20  ls
+   21  k apply -f replicaset-definition-2.yaml 
+   22  k get all
+   23  k get rs
+   24  k delete -f replicaset-definition-1.yaml
+   25  k delete -f replicaset-definition-2.yaml 
+   26  ls
+   27  k ger rs
+   28  k get rs
+   29  k edit rs new-replica-set 
+   30  k get rs
+   31  k get pod
+   32  ls
+   33  k edit rs new-replica-set 
+   34  k delete pod new-replica-set-tns4p new-replica-set-lh9dx new-replica-set-r86b7 new-replica-set-6jjbb 
+   35  k get pod
+   36  k scale rs --replicas 5 new-replica-set 
+   37  k get rs
+   38  history
+   39  k scale rs --replicas 2 new-replica-set 
+   40  k get rs
+   41  history
