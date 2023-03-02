@@ -1,0 +1,8 @@
+kubectl -n webhook-demo create secret tls webhook-server-tls \
+> --cert "/root/keys/webhook-server-tls.crt" \
+> --key "/root/keys/webhook-server-tls.key"
+secret/webhook-server-tls created
+
+
+kubectl get po pod-with-defaults -o yaml
+kubectl get po pod-with-defaults -o yaml | grep -A2 " securityContext:"
