@@ -1,0 +1,21 @@
+    1  k api-resources 
+    2  k api-versions 
+    3  k explain job
+    4  k proxy 8001&
+    5  curl localhost:8001/apis/authorization.k8s.io
+    6  cp /etc/kubernetes/manifests/kube-apiserver.yaml /root/kube-apiserver-backup.yaml
+    7  ls
+    8  vi /etc/kubernetes/manifests/kube-apiserver.yaml 
+    9  k get pod -n kube-system
+   10  cat kube-apiserver-backup.yaml 
+   11  curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl-convert"
+   12  ls
+   13  mv kubectl-convert /usr/local/bin/
+   14  kubectl-convert --help
+   15  chmod +x /usr/local/bin/kubectl-convert 
+   16  kubectl-convert -help
+   17  cat ingress-old.yaml 
+   18  kubectl-convert -f ingress-old.yaml --output-version networking.k8s.io/v1
+   22  kubectl-convert -f ingress-old.yaml --output-version networking.k8s.io/v1 > ingress-new.yaml
+   23  ls
+   24  k apply -f ingress-new.yaml 
