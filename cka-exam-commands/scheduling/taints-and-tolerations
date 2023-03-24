@@ -1,0 +1,49 @@
+How many nodes exist on the system? Including the controlplane node.
+--> k get nodes
+
+Do any taints exist on node01 node?
+--> k describe node node01 | grep -i taints
+
+Create a taint on node01 with key of spray, value of mortein and effect of NoSchedule
+--> k taint nodes node01 spray=mortein:NoSchedule
+
+Create a new pod with the nginx image and pod name as mosquito.
+--> k run mosquito --image nginx
+
+What is the state of the pod
+--> k get pod mosquito
+NAME       READY   STATUS    RESTARTS   AGE
+mosquito   0/1     Pending   0          78s
+
+Why do you think the pod is in a pending state?
+--> POD Mosquito cannot tolerate taint Mortein
+
+
+Create another pod named bee with the nginx image, which has a toleration set to the taint mortein.
+--> k apply -f bee.yaml
+        ---
+        apiVersion: v1
+        kind: Pod
+        metadata:
+        name: bee
+        spec:
+        containers:
+        - image: nginx
+            name: bee
+        tolerations:
+        - key: spray
+            value: mortein
+            effect: NoSchedule
+            operator: Equal
+    
+
+Do you see any taints on controlplane node?
+--> k describe node controlplane | grep -i taints
+Taints:             node-role.kubernetes.io/control-plane:NoSchedule
+
+Remove the taint on controlplane, which currently has the taint effect of NoSchedule.
+--> k taint node controlplane node-role.kubernetes.io/control-plane:NoSchedule-
+node/controlplane untainted
+
+
+

@@ -1,0 +1,54 @@
+
+A pod definition file nginx.yaml is given. Create a pod using the file.
+      ---
+      apiVersion: v1
+      kind: Pod
+      metadata:
+      name: nginx
+      spec:
+      containers:
+      -  image: nginx
+         name: nginx
+
+--> kubectl apply -f naginx.yaml
+
+What is the status of the created POD?
+
+--> k get pod
+NAME    READY   STATUS    RESTARTS   AGE
+nginx   0/1     Pending   0          40s
+
+Why is the POD in a pending state?
+
+Hint: Check the status of the scheduler in this cluster. Is it running?
+
+Manually schedule the pod on node01.
+
+--> k get nodes 
+NAME           STATUS   ROLES           AGE     VERSION
+controlplane   Ready    control-plane   9m51s   v1.26.0
+node01         Ready    <none>          9m16s   v1.26.0
+
+      ---
+      apiVersion: v1
+      kind: Pod
+      metadata:
+      name: nginx
+      spec: 
+      nodeName: node01   # Update the nodeName into manifest file
+      containers:
+      -  image: nginx
+         name: nginx
+
+Now schedule the same pod on the controlplane node.
+
+      ---
+      apiVersion: v1
+      kind: Pod
+      metadata:
+      name: nginx
+      spec:
+      nodeName: controlplane # Update the nodeName into manifest file
+      containers:
+      -  image: nginx
+         name: nginx
