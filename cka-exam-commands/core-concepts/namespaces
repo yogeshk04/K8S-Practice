@@ -1,0 +1,13 @@
+1  k get ns
+    2  k get ns --no-headers | wc -l
+
+    5  k get ns --no-headers | wc -l
+    6  k get po -n research 
+    9  k get pods -n finance 
+   10  k run redis --image redis -n finance 
+   11  k delete pod pod -n finance 
+   13  k get po -n all
+   14  k get pod --all-namespaces 
+   15  k get pod --all-namespaces | grep blue
+   17  k get svc
+   18  k get svc --all-namespaces

@@ -1,0 +1,39 @@
+1  k get pods
+    2  k get rs
+    3  k get replicasets.apps 
+    4  k get rs
+    5  k describe rs new-replica-set 
+    6  k get pods
+    7  k get rs
+    8  k delete pod new-replica-set-7k5bh 
+    9  k get pods
+   10  ls
+   11  k create -f replicaset-definition-1.yaml 
+   12  k create -f replicaset-definition-1.yaml 
+   13  vi replicaset-definition-1.yaml 
+   14  k create -f replicaset-definition-1.yaml 
+   15  vi replicaset-definition-1.yaml 
+   16  k create -f replicaset-definition-1.yaml 
+   17  ls
+   18  vi replicaset-definition-2.yaml 
+   19  k apply -f replicaset-definition-2.yaml 
+   20  k delete -f replicaset-definition-1.yaml  -f replicaset-definition-2.yaml 
+   21  ls
+   22  k edit rs new-replica-set 
+   23  k get rs
+   24  k get pods
+   25  k get rs new-replica-set -oyaml > rs.yaml
+   26  ls
+   27  vi rs.yaml 
+   28  k apply -f rs.yaml --force
+   29  k delete rs new-replica-set 
+   30  k apply -f rs.yaml 
+   31  k get pods
+   32  k get pods
+   33  k scale rs --replicas 5
+   34  k scale rs new-replica-set --replicas 5
+   35  k get rs 
+   36  k get pods
+   37  k get pod
+   38  k scale rs new-replica-set --replicas 2
+   39  k get pods

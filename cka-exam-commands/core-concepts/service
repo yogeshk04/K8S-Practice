@@ -1,0 +1,11 @@
+    1  k get svc
+    2  k get svc -n default 
+    3  k describe svc kubernetes b
+    4  k get deploy
+    5  k get pod
+    6  k describe pod simple-webapp-deployment-c7c68b6f4-tmwh4 
+    7  ls
+    8  cat service-definition-1.yaml 
+    9  vi service-definition-1.yaml 
+   10  k describe deployments.apps simple-webapp-deployment 
+   11  k apply -f service-definition-1.yaml

@@ -1,0 +1,20 @@
+1  alias k=kubectl
+    2  k get pods
+    3  k run nginx --image nginx
+    4  k get pod
+    5  k get pod
+    6  k get pods
+    7  k get pod -w
+    8  k describe pod newpods-zs56p 
+    9  k describe pod newpods-zs56p | grep Node
+   10  k describe pod newpods-zs56p -o wide
+   11  k get pod -o wide
+   12  k get pods
+   13  k describe pod webapp 
+   14  k get pods
+   15  k delete pod webapp 
+   16  k run redis --image redis123
+   17  k get pod
+   18  k edit pod redis 
+   19  k get pod
+   20  k get pod

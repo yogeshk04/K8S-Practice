@@ -1,0 +1,117 @@
+@Library('github.com/releaseworks/jenkinslib') _
+pipeline {
+	agent none
+
+    environment {
+
+		HELM_VERSION = "v3.9.3"
+
+		DOCKER_REPOSITORY_DEV = "marketplace-docker-dev.artifactory.ars.de"
+
+		//DOCKER_REPOSITORY_PROD = "marketplace-docker-prod.artifactory.ars.de"
+
+		DOCKER_IMAGE_NAME = "marketplace"
+		
+		DOCKER_IMAGE_TAG = "1.0.0"
+
+		
+
+		// enable buildkit
+		DOCKER_BUILDKIT = "1"
+
+		// Namespace to use for deployment
+		NAMESPACE = "default"
+	}
+
+    stages {
+		stage('Checkout SCM') {
+			agent any
+
+			steps {
+				checkout scm
+			}
+		}
+
+        stage('Build Maven Jar') {
+            agent any
+
+            steps {
+                withMaven(
+                    maven: 'maven-3.9.0',
+                ) {
+                    sh 'mvn package'
+                }
+            }
+        }
+
+		stage('Build Docker Image Dev') {
+		   	agent any
+			steps {
+				withCredentials([
+					usernamePassword(credentialsId: '9bc66637-9609-4f5d-9ad9-9021e363db39',
+						usernameVariable: 'dockerUser',
+						passwordVariable: 'dockerPassword'),
+				]) {
+					// Login to Artifactory
+					sh 'docker login -u ${dockerUser} -p ${dockerPassword} ${DOCKER_REPOSITORY_DEV}'
+
+					// Build Image
+					sh 'docker build --no-cache --network host -t ${DOCKER_REPOSITORY_DEV}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} -f ./src/main/docker/Dockerfile.jvm .'
+
+					// Push Images
+					sh 'docker push ${DOCKER_REPOSITORY_DEV}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}'
+				}
+			}
+		}
+		/*
+		stage('Deploy to EKS') {
+		    agent any
+			steps {
+				//withCredentials([usernamePassword(credentialsId: 'omar-aws-user-pass', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+
+				withAWS(region:'eu-central-1', credentials:'nikam') {
+
+					sh 'aws sts get-caller-identity'
+
+					sh 'aws eks --region eu-central-1 update-kubeconfig --name ars-cc-eks-cluster'
+
+					// install helm
+					sh 'if test ! -f /tmp/helm-${HELM_VERSION}/helm ; then \
+							mkdir -p /tmp/helm-${HELM_VERSION} \
+							&& curl -sL https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz \
+								| tar xz -C /tmp/helm-${HELM_VERSION} --strip-components 1 linux-amd64/helm ; \
+						fi'
+
+					// helm install
+					sh '/tmp/helm-${HELM_VERSION}/helm upgrade --install --recreate-pods --cleanup-on-fail \
+							--namespace ${NAMESPACE} \
+                            -f ./helm/marketplace/values.yaml \
+							marketplace ./helm/marketplace'
+    				}
+			}
+		}
+		*/
+		stage('Deploy to Kubernetes Dev Stage') {
+		    agent any
+			steps {
+				withCredentials([
+					file(credentialsId: 'KubeconfigMarketplace', variable: 'KUBECONFIG'),
+				]) {
+
+					// install helm
+					sh 'if test ! -f /tmp/helm-${HELM_VERSION}/helm ; then \
+							mkdir -p /tmp/helm-${HELM_VERSION} \
+							&& curl -sL https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz \
+								| tar xz -C /tmp/helm-${HELM_VERSION} --strip-components 1 linux-amd64/helm ; \
+						fi'
+
+					// helm install
+					sh '/tmp/helm-${HELM_VERSION}/helm upgrade --install --recreate-pods --cleanup-on-fail \
+							--namespace ${NAMESPACE} \
+                            -f ./helm/marketplace/values.yaml \
+							marketplace ./helm/marketplace'
+				}
+			}
+		}
+	}
+}

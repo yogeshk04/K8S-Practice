@@ -1,0 +1,15 @@
+1  k get po
+    2  k get rs
+    3  k get deploy
+    4  k get deploy
+    5  k get rs
+    6  k get pod
+    7  k get pod -o wide 
+    8  k describe pod frontend-deployment-7fbf4f5cd9-fmzht 
+    9  k describe deploy frontend-deployment 
+   10  ls
+   11  vi deployment-definition-1.yaml 
+   12  k create -f deployment-definition-1.yaml 
+   13  k get deployments.apps 
+   14  k create deployment httpd-frontend --image httpd:2.4-alpine --replicas 3
+   15  k get deployments.apps
