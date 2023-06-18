@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ssl-redirect: "true"
+    meta.helm.sh/release-name: ets
+    meta.helm.sh/release-namespace: nTEST
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: 1g
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/whitelist-source-range: 3.126.67.241/32, 65.0.77.29, 13.127.8.0, 65.0.155.194, 192.168.178.172
+    nginx.org/client-max-body-size: 256m
+    nginx.org/enable-cors: "true"
+    nginx.org/proxy-buffering: "false"
+    nginx.org/proxy-connect-timeout: 30s
+    nginx.org/proxy-read-timeout: 3600s
+    nginx.org/proxy-send-timeout: 3600s
+    nginx.org/websocket-services: cloud-gateway-service
+  creationTimestamp: "2023-02-02T22:10:31Z"
+  generation: 1
+  labels:
