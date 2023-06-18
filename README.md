@@ -1,12 +1,14 @@
+# export KUBECONFIG=~/.kube/kubeconfig-demo.yaml
+
 sudo -i
 
 yum update -y
 
 swapoff -a
-# The Kubernetes scheduler determines the best available node on which to deploy newly created pods. If memory swapping is allowed to occur on a host system, this can lead ot performance and stability issues withn Kubernetes.
+## The Kubernetes scheduler determines the best available node on which to deploy newly created pods. If memory swapping is allowed to occur on a host system, this can lead ot performance and stability issues withn Kubernetes.
 
 setenforce 0
-# Disabling the SElinux makes all containers can easily access host filesystems
+## Disabling the SElinux makes all containers can easily access host filesystems
 
 yum install docker -y
 
