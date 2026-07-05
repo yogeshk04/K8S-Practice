@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2026-07-05T09:09:39Z"
+  labels:
+    app: blue
+  name: blue
+  namespace: default
+  resourceVersion: "216259"
+  uid: 0db8f8bf-e72f-4900-a2bf-4431f032c719
+spec:
+  clusterIP: 10.100.179.37
+  clusterIPs:
+  - 10.100.179.37
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: green # Now pointing to the green deployment
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
