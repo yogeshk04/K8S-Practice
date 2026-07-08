@@ -1,0 +1,37 @@
+# =============================================================================
+# Scenario 9 : CrashLoopBackOff — OutOfMemory (OOMKilled)
+# -----------------------------------------------------------------------------
+# WHAT IS BROKEN
+#   'polinux/stress' is asked to allocate 250M of memory, but the container
+#   memory limit is only 200Mi. The kernel OOM-killer terminates the
+#   container, kubelet restarts it, it OOMs again — CrashLoopBackOff.
+#
+# EXPECTED SYMPTOM
+#   Pod status         : CrashLoopBackOff (or Running briefly, then restarts)
+#   Last state reason  : OOMKilled  (exit code 137)
+#
+# HOW TO DIAGNOSE
+#   kubectl get pod inres
+#   kubectl describe pod inres              # look at 'Last State: Terminated / OOMKilled'
+#
+# HOW TO FIX
+#   Raise resources.limits.memory above the workload's real usage, e.g.:
+#     limits: { memory: "300Mi" }
+# =============================================================================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: inres
+spec:
+  containers:
+    - name: main
+      image: polinux/stress
+      command: ["stress"]
+      # Ask the workload to allocate 250M of memory (--vm-hang keeps it held).
+      args: ["--vm", "1", "--vm-bytes", "250M", "--vm-hang", "1"]
+      resources:
+        requests:
+          memory: "100Mi"
+        limits:
+          # ⚠️  Intentionally lower than what the app allocates -> OOMKilled.
+          memory: "200Mi"

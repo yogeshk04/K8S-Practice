@@ -1,0 +1,60 @@
+# =============================================================================
+# Scenario 13 : Runtime Error — Service selector doesn't match pods
+# -----------------------------------------------------------------------------
+# WHAT IS BROKEN
+#   The Deployment's pods are labelled  app=service-error-demo
+#   The Service selects on            wezvatech: ninjasprogram
+#   The two do NOT overlap, so the Service has zero endpoints and any traffic
+#   to it goes nowhere. Pods look healthy — the failure is in the wiring.
+#
+# EXPECTED SYMPTOM
+#   Pods        : Running (2/2)
+#   Service     : exists, ClusterIP assigned
+#   Endpoints   : <none>
+#   Any client hitting the service gets connection refused / times out.
+#
+# HOW TO DIAGNOSE
+#   kubectl get pods --show-labels
+#   kubectl get svc demoservice
+#   kubectl get endpoints demoservice         # <-- the big clue: empty
+#   kubectl describe svc demoservice          # selector line vs. pod labels
+#
+# HOW TO FIX
+#   Align the Service selector with the pod labels, e.g. change the selector
+#   below to:
+#     selector:
+#       app: service-error-demo
+# =============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: service-error-demo
+  template:
+    metadata:
+      name: serviceerr
+      labels:
+        app: service-error-demo
+    spec:
+      containers:
+        - name: main
+          image: httpd
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demoservice
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  # ⚠️  Intentionally does NOT match the pod labels above -> no endpoints.
+  selector:
+    wezvatech: ninjasprogram
+  type: ClusterIP

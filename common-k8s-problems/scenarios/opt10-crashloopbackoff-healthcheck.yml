@@ -1,0 +1,54 @@
+# =============================================================================
+# Scenario 10 : CrashLoopBackOff — Bad Liveness Probe
+# -----------------------------------------------------------------------------
+# WHAT IS BROKEN
+#   The container image (httpd) runs fine, but the liveness probe checks
+#   'ls /tmp/lp' — a path that does not exist inside the container. The
+#   probe therefore fails, kubelet restarts the container, and the cycle
+#   repeats.
+#
+# EXPECTED SYMPTOM
+#   Pod status  : Running briefly, then Restarts count keeps increasing
+#   Events      : "Liveness probe failed: ls: cannot access /tmp/lp"
+#
+# HOW TO DIAGNOSE
+#   kubectl get pods
+#   kubectl describe pod <pod>              # 'Liveness probe failed' in Events
+#
+# HOW TO FIX  (choose one)
+#   * Change the probe to something meaningful for httpd:
+#       livenessProbe:
+#         httpGet: { path: /, port: 80 }
+#         initialDelaySeconds: 10
+#         periodSeconds: 10
+#   * Or make the path exist by mounting/creating it.
+# =============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: healthcheck
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: healthcheck-demo
+  template:
+    metadata:
+      name: healthprobe
+      labels:
+        app: healthcheck-demo
+    spec:
+      containers:
+        - name: main
+          image: httpd
+          ports:
+            - containerPort: 80
+          livenessProbe:
+            # ⚠️  Intentionally checks a path that does not exist.
+            exec:
+              command:
+                - ls
+                - /tmp/lp
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 10

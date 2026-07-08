@@ -1,0 +1,31 @@
+# =============================================================================
+# Scenario 12 : CrashLoopBackOff — Application crashes at runtime
+# -----------------------------------------------------------------------------
+# WHAT IS BROKEN
+#   The image itself (yogeshk04/backend:v5) crashes shortly after starting,
+#   so kubelet keeps restarting it. Nothing is wrong with the manifest — the
+#   defect lives INSIDE the container.
+#
+# EXPECTED SYMPTOM
+#   Pod status  : CrashLoopBackOff
+#   Container   : exits with non-zero code, Restarts count grows quickly
+#
+# HOW TO DIAGNOSE
+#   kubectl get pods
+#   kubectl describe pod runtimeerr
+#   kubectl logs runtimeerr                 # current attempt
+#   kubectl logs runtimeerr --previous      # logs from the crashed instance
+#
+# HOW TO FIX
+#   Fix the app (rebuild the image with a working entrypoint) or switch to a
+#   known-good image tag. This scenario teaches you to always read the logs.
+# =============================================================================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: runtimeerr
+spec:
+  containers:
+    - name: main
+      # ⚠️  Intentionally an image whose entrypoint crashes.
+      image: yogeshk04/backend:v5

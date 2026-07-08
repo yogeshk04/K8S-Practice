@@ -1,0 +1,29 @@
+# =============================================================================
+# Scenario 8 : ImagePullBackOff / ErrImagePull
+# -----------------------------------------------------------------------------
+# WHAT IS BROKEN
+#   The container references an image tag ('yogeshk04/frontend:v41') that
+#   does not exist in the registry. The kubelet retries with exponential
+#   back-off, hence the 'ImagePullBackOff' phase.
+#
+# EXPECTED SYMPTOM
+#   Pod status  : ErrImagePull  ->  ImagePullBackOff
+#   Events      : "Failed to pull image ... manifest for ... not found"
+#
+# HOW TO DIAGNOSE
+#   kubectl get pods
+#   kubectl describe pod imagepull           # Events at the bottom
+#
+# HOW TO FIX
+#   Point the container to an image/tag that actually exists (or make sure
+#   your imagePullSecrets are correct if pulling from a private registry).
+# =============================================================================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: imagepull
+spec:
+  containers:
+    - name: main
+      # ⚠️  Intentionally a non-existent tag.
+      image: yogeshk04/frontend:v41

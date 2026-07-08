@@ -1,0 +1,49 @@
+# =============================================================================
+# Scenario 7 : ResourceQuota blocks scaling
+# -----------------------------------------------------------------------------
+# WHAT IS BROKEN
+#   A ResourceQuota limits the namespace to 2 pods, but the Deployment asks
+#   for 3 replicas. The ReplicaSet will keep failing to create the 3rd pod.
+#
+# EXPECTED SYMPTOM
+#   Deployment  : 2 / 3 available (never reaches 3)
+#   ReplicaSet events: "exceeded quota: pod-demo, requested: pods=1, used: pods=2, limited: pods=2"
+#
+# HOW TO DIAGNOSE
+#   kubectl get deploy,rs,pod
+#   kubectl describe rs <rs-name>            # look at Events at the bottom
+#   kubectl describe resourcequota pod-demo
+#
+# HOW TO FIX
+#   Either lower the Deployment's replicas below the quota, or raise/remove
+#   the quota, e.g.:
+#     kubectl delete resourcequota pod-demo
+# =============================================================================
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: pod-demo
+spec:
+  hard:
+    # ⚠️  Intentionally small — the Deployment below tries to exceed it.
+    pods: "2"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resourcequota
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: resource-quota-demo
+  template:
+    metadata:
+      name: resq
+      labels:
+        app: resource-quota-demo
+    spec:
+      containers:
+        - name: main
+          image: ubuntu
+          command: ["/bin/bash", "-c", "while true; do echo 'still alive'; sleep 10; done"]

@@ -1,0 +1,43 @@
+# =============================================================================
+# Scenario 2 : Node Affinity / nodeSelector mismatch
+# -----------------------------------------------------------------------------
+# WHAT IS BROKEN
+#   The pod uses a nodeSelector (mynode=demonode) but no node in the cluster
+#   carries that label, so the scheduler has nowhere to place it.
+#
+# EXPECTED SYMPTOM
+#   Pod status  : Pending
+#   Reason      : FailedScheduling — "didn't match Pod's node affinity/selector"
+#
+# HOW TO DIAGNOSE
+#   kubectl get pods
+#   kubectl describe pod <pod>              # Events section
+#   kubectl get nodes --show-labels
+#
+# HOW TO FIX
+#   Add the matching label to any node:
+#     kubectl label node <node-name> mynode=demonode
+#   (The lab script will offer to do this for you.)
+# =============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodeaffinity
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node-affinity-demo
+  template:
+    metadata:
+      name: nodeaffin
+      labels:
+        app: node-affinity-demo
+    spec:
+      containers:
+        - name: main
+          image: ubuntu
+          command: ["/bin/bash", "-c", "while true; do echo 'still alive'; sleep 10; done"]
+      # ⚠️  Intentionally targets a label no node has.
+      nodeSelector:
+        mynode: demonode

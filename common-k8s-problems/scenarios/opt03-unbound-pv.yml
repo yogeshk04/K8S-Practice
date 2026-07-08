@@ -1,0 +1,62 @@
+# =============================================================================
+# Scenario 3 : Unbound PersistentVolumeClaim (PVC)
+# -----------------------------------------------------------------------------
+# WHAT IS BROKEN
+#   The lab script disables the default StorageClass before applying this
+#   manifest. Because no default StorageClass is available and the PVC does
+#   not specify one, dynamic provisioning cannot happen — the PVC stays in
+#   'Pending' forever, so the pod (which mounts it) also stays 'Pending'.
+#
+# EXPECTED SYMPTOM
+#   PVC status  : Pending
+#   Pod status  : Pending — "pod has unbound immediate PersistentVolumeClaims"
+#
+# HOW TO DIAGNOSE
+#   kubectl get pvc
+#   kubectl describe pvc myebsvolclaim
+#   kubectl get storageclass
+#
+# HOW TO FIX
+#   Re-enable the default StorageClass (or set one via spec.storageClassName):
+#     kubectl patch storageclass standard \
+#       -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+# =============================================================================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: myebsvolclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  # storageClassName intentionally omitted — relies on a default class
+  # which the lab script has disabled.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pvdeploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: unbound-pv-demo
+  template:
+    metadata:
+      name: pvd
+      labels:
+        app: unbound-pv-demo
+    spec:
+      containers:
+        - name: main
+          image: centos
+          command: ["/bin/bash", "-c", "sleep 10000"]
+          volumeMounts:
+            - name: mypd
+              mountPath: "/tmp/persistent"
+      volumes:
+        - name: mypd
+          persistentVolumeClaim:
+            claimName: myebsvolclaim

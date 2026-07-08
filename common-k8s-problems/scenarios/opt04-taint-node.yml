@@ -1,0 +1,47 @@
+# =============================================================================
+# Scenario 4 : Node Taint without matching Toleration
+# -----------------------------------------------------------------------------
+# WHAT IS BROKEN
+#   The lab script taints the node with 'taint=true:NoSchedule' before
+#   applying this manifest. The pod does not declare a matching toleration,
+#   so the scheduler refuses to place it on the tainted node.
+#
+# EXPECTED SYMPTOM
+#   Pod status  : Pending
+#   Reason      : FailedScheduling — "had untolerated taint {taint: true}"
+#
+# HOW TO DIAGNOSE
+#   kubectl get pods
+#   kubectl describe pod <pod>              # Events section
+#   kubectl describe node  <node>           # look for the 'Taints:' line
+#
+# HOW TO FIX  (choose one)
+#   1) Add a matching toleration to the pod spec:
+#        tolerations:
+#          - key: "taint"
+#            operator: "Equal"
+#            value: "true"
+#            effect: "NoSchedule"
+#   2) Or remove the taint from the node:
+#        kubectl taint nodes <node> taint=true:NoSchedule-
+# =============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodetaint
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node-taint-demo
+  template:
+    metadata:
+      name: taint
+      labels:
+        app: node-taint-demo
+    spec:
+      containers:
+        - name: main
+          image: ubuntu
+          command: ["/bin/bash", "-c", "while true; do echo 'still alive'; sleep 10; done"]
+      # ⚠️  Intentionally NO toleration — that's the bug.

@@ -1,0 +1,46 @@
+# =============================================================================
+# Scenario 1 : Insufficient Resource
+# -----------------------------------------------------------------------------
+# WHAT IS BROKEN
+#   The pod requests 4Gi of memory (and a 6Gi limit) which is larger than the
+#   allocatable memory on a typical single-node minikube / kind cluster, so the
+#   scheduler cannot place it on any node.
+#
+# EXPECTED SYMPTOM
+#   Pod status  : Pending
+#   Reason      : FailedScheduling — "Insufficient memory"
+#
+# HOW TO DIAGNOSE
+#   kubectl get pods -o wide
+#   kubectl describe pod <pod>               # look at the Events section
+#   kubectl describe nodes | grep -A5 Allocatable
+#
+# HOW TO FIX
+#   Lower spec.containers[].resources.requests.memory (and .limits.memory)
+#   to a value your node can actually satisfy, e.g. requests: 100Mi / limits: 200Mi.
+# =============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: insufficientresource
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: insufficient-resource-demo
+  template:
+    metadata:
+      name: inres
+      labels:
+        app: insufficient-resource-demo
+    spec:
+      containers:
+        - name: main
+          image: ubuntu
+          command: ["/bin/bash", "-c", "while true; do echo 'still alive'; sleep 10; done"]
+          resources:
+            # ⚠️  Intentionally too high — the whole point of this scenario.
+            requests:
+              memory: "4Gi"
+            limits:
+              memory: "6Gi"

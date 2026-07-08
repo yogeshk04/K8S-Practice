@@ -1,0 +1,42 @@
+# =============================================================================
+# Scenario 5 : Missing / Unavailable ConfigMap
+# -----------------------------------------------------------------------------
+# WHAT IS BROKEN
+#   The pod mounts a volume backed by a ConfigMap named 'mymap', but that
+#   ConfigMap has NOT been created in the namespace. The kubelet cannot
+#   materialise the volume, so the container never starts.
+#
+# EXPECTED SYMPTOM
+#   Pod status  : ContainerCreating (stays there)
+#   Events      : "configmap \"mymap\" not found"
+#
+# HOW TO DIAGNOSE
+#   kubectl get pods
+#   kubectl describe pod configmap          # Events section is the giveaway
+#   kubectl get configmap
+#
+# HOW TO FIX
+#   Create the ConfigMap the pod expects. Two examples:
+#     kubectl create configmap mymap --from-literal=sample.conf="hello=world"
+#     kubectl create configmap mymap --from-file=./sample.conf
+# =============================================================================
+apiVersion: v1
+kind: Pod
+metadata:
+  name: configmap
+spec:
+  containers:
+    - name: main
+      image: ubuntu
+      command: ["/bin/bash", "-c", "while true; do echo 'still alive'; sleep 10; done"]
+      volumeMounts:
+        - name: appconfig
+          mountPath: "/tmp/config"
+  volumes:
+    - name: appconfig
+      configMap:
+        # ⚠️  Intentionally references a ConfigMap that does not exist.
+        name: mymap
+        items:
+          - key: sample.conf   # key inside the ConfigMap
+            path: sample.conf  # file name inside the mounted directory
