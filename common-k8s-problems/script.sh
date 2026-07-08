@@ -183,13 +183,13 @@ print_hints() {
         ;;
       opt13-runtimeerr-svc.yml)
         info "Symptom  : Service has no endpoints — traffic does not reach any pod."
-        info "Cause    : Service selector 'wezvatech: ninjasprogram' does NOT match the"
-        info "           pod labels 'wezvatech: adam'."
+        info "Cause    : Service selector 'scenario: ninjasprogram' does NOT match the"
+        info "           pod labels 'scenario: adam'."
         tip  "Diagnose :  kubectl get endpoints demoservice   (should be <none>)"
         tip  "Diagnose :  kubectl describe svc demoservice"
         tip  "Diagnose :  kubectl get pods --show-labels"
         tip  "Fix      : Align the service selector with the pod labels, e.g. change"
-        tip  "           the selector to 'wezvatech: adam'."
+        tip  "           the selector to 'scenario: adam'."
         ;;
       *)
         warn "No hints defined for '$manifest'."
