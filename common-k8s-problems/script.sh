@@ -14,9 +14,6 @@
 #    2. HOW to diagnose it   (kubectl commands to try)
 #    3. HOW to fix it        (what the correct config would be)
 #    4. A cleanup prompt
-#
-#  Original author : Adam - WezvaTechnologies  (+91-9739110917)
-#  Reorganised     : educational rewrite with colours, hints and helpers
 # =============================================================================
 
 # -------- Strict-ish mode (script is meant to be resilient, not fail-fast) ----
